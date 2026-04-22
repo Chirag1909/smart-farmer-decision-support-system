@@ -24,7 +24,14 @@ const jsonRequest = async (url, method = "GET", body = null) => {
   const token = localStorage.getItem(tokenKey);
   if (token) headers.Authorization = `Bearer ${token}`;
   const response = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : null });
-  const data = await response.json();
+  const contentType = response.headers.get("content-type") || "";
+  let data = {};
+  if (contentType.includes("application/json")) {
+    data = await response.json();
+  } else {
+    const text = await response.text();
+    throw new Error(text || "Server returned a non-JSON response");
+  }
   if (!response.ok) throw new Error(data.error || "Request failed");
   return data;
 };
@@ -104,11 +111,14 @@ const attachAuthForms = () => {
       const payload = Object.fromEntries(new FormData(loginForm).entries());
       try {
         const result = await jsonRequest("/login", "POST", payload);
+        if (!result.success || !result.token) {
+          throw new Error(result.error || "Login failed. Please try again.");
+        }
         localStorage.setItem(tokenKey, result.token);
         setFormMessage("login-message", "");
         window.location.href = "/dashboard-page";
       } catch (err) {
-        setFormMessage("login-message", err.message);
+        setFormMessage("login-message", err?.message || "Login failed");
       }
     });
   }

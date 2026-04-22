@@ -31,4 +31,4 @@ def login():
         return jsonify({"error": "Invalid credentials"}), 401
 
     token = create_jwt(user["id"], user["username"])
-    return jsonify({"token": token, "user": user})
+    return jsonify({"success": True, "token": token, "user": user})
