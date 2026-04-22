@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+<h1>🌾 Farmer Decision Dashboard</h1>
+
+<form method="POST">
+    <select name="state">
+        <option>Chhattisgarh</option>
+        <option>Maharashtra</option>
+        <option>Gujarat</option>
+    </select>
+
+    <button type="submit">Analyze</button>
+</form>
+
+{% if crops %}
+<h2>Top Crops</h2>
+<table>
+<tr><th>Crop</th><th>Yield</th><th>Price</th></tr>
+{% for c in crops %}
+<tr>
+<td>{{c.crop}}</td>
+<td>{{c.predicted_yield}}</td>
+<td>{{c.modal_price}}</td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+
+{% if profit %}
+<h2>Profit Forecast</h2>
+<table>
+<tr><th>Crop</th><th>Profit</th></tr>
+{% for p in profit %}
+<tr>
+<td>{{p.crop}}</td>
+<td>{{p.expected_profit}}</td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Smart Crop Decision Support System</title>
+
+<style>
+
+body{
+font-family: Arial;
+margin:0;
+background:#f4f4f4;
+}
+
+/* LOGIN */
+
+#loginPage{
+width:320px;
+margin:120px auto;
+background:white;
+padding:30px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+text-align:center;
+}
+
+input,select{
+width:100%;
+padding:10px;
+margin:10px 0;
+}
+
+button{
+padding:10px;
+background:#2e7d32;
+color:white;
+border:none;
+cursor:pointer;
+width:100%;
+}
+
+/* APP */
+
+#app{
+display:none;
+}
+
+.sidebar{
+width:220px;
+height:100vh;
+background:#2e7d32;
+color:white;
+position:fixed;
+padding:20px;
+}
+
+.sidebar a{
+display:block;
+color:white;
+text-decoration:none;
+margin:12px 0;
+cursor:pointer;
+}
+
+.main{
+margin-left:240px;
+padding:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+margin:10px 0;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
+}
+
+th,td{
+border:1px solid #ccc;
+padding:10px;
+text-align:center;
+}
+
+.page{
+display:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+
+<div id="loginPage">
+
+<h2>Smart Crop Decision System</h2>
+
+<input type="text" placeholder="Farmer ID">
+
+<input type="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+</div>
+
+
+<!-- APP -->
+
+<div id="app">
+
+<div class="sidebar">
+
+<h3>Menu</h3>
+
+<a onclick="showPage('dashboard')">Dashboard</a>
+<a onclick="showPage('recommend')">Crop Recommendation</a>
+<a onclick="showPage('profit')">Profit Forecast</a>
+<a onclick="showPage('mandi')">Best Mandi</a>
+<a onclick="showPage('weather')">Weather</a>
+
+</div>
+
+<div class="main">
+
+<!-- DASHBOARD -->
+
+<div id="dashboard" class="page">
+
+<h2>Dashboard</h2>
+
+<div class="card">
+Select State
+<select id="stateSelect">
+<option>Tamil Nadu</option>
+<option>Karnataka</option>
+<option>Maharashtra</option>
+</select>
+</div>
+
+<div class="card">
+System Overview  
+<br><br>
+• Crop Recommendation  
+• Price Forecasting  
+• Profit Prediction  
+• Best Mandi Suggestion  
+• Weather Integration
+</div>
+
+</div>
+
+<!-- CROP RECOMMENDATION -->
+
+<div id="recommend" class="page">
+
+<h2>Top 5 Crop Recommendation</h2>
+
+<button onclick="generateCrops()">Generate Recommendation</button>
+
+<table id="cropTable">
+
+<tr>
+<th>Rank</th>
+<th>Crop</th>
+<th>Predicted Yield</th>
+<th>Price</th>
+<th>Expected Revenue</th>
+</tr>
+
+</table>
+
+</div>
+
+<!-- PROFIT FORECAST -->
+
+<div id="profit" class="page">
+
+<h2>Profit Forecast</h2>
+
+<button onclick="generateProfit()">Calculate Profit</button>
+
+<table id="profitTable">
+
+<tr>
+<th>Crop</th>
+<th>Revenue</th>
+<th>Cost</th>
+<th>Profit</th>
+</tr>
+
+</table>
+
+</div>
+
+<!-- MANDI -->
+
+<div id="mandi" class="page">
+
+<h2>Best Mandi Recommendation</h2>
+
+<table>
+
+<tr>
+<th>Market</th>
+<th>Crop</th>
+<th>Modal Price</th>
+<th>Distance</th>
+</tr>
+
+<tr>
+<td>Chennai Mandi</td>
+<td>Rice</td>
+<td>₹2100</td>
+<td>15 km</td>
+</tr>
+
+<tr>
+<td>Madurai Market</td>
+<td>Rice</td>
+<td>₹2000</td>
+<td>30 km</td>
+</tr>
+
+</table>
+
+</div>
+
+<!-- WEATHER -->
+
+<div id="weather" class="page">
+
+<h2>Weather Information</h2>
+
+<div class="card">
+Temperature : 28°C
+</div>
+
+<div class="card">
+Humidity : 70%
+</div>
+
+<div class="card">
+Rain Prediction : Moderate Rain
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function login(){
+document.getElementById("loginPage").style.display="none";
+document.getElementById("app").style.display="block";
+showPage("dashboard");
+}
+
+function showPage(page){
+
+var pages=document.getElementsByClassName("page");
+
+for(var i=0;i<pages.length;i++){
+pages[i].style.display="none";
+}
+
+document.getElementById(page).style.display="block";
+
+}
+
+
+/* CROP RECOMMENDATION */
+
+function generateCrops(){
+
+var table=document.getElementById("cropTable");
+
+table.innerHTML=`
+<tr>
+<th>Rank</th>
+<th>Crop</th>
+<th>Predicted Yield</th>
+<th>Price</th>
+<th>Expected Revenue</th>
+</tr>
+
+<tr>
+<td>1</td>
+<td>Rice</td>
+<td>4500 kg</td>
+<td>₹2100</td>
+<td>₹94,500</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>Maize</td>
+<td>4000 kg</td>
+<td>₹1800</td>
+<td>₹72,000</td>
+</tr>
+
+<tr>
+<td>3</td>
+<td>Groundnut</td>
+<td>3000 kg</td>
+<td>₹3200</td>
+<td>₹96,000</td>
+</tr>
+
+<tr>
+<td>4</td>
+<td>Millet</td>
+<td>2800 kg</td>
+<td>₹2600</td>
+<td>₹72,800</td>
+</tr>
+
+<tr>
+<td>5</td>
+<td>Sugarcane</td>
+<td>5000 kg</td>
+<td>₹1500</td>
+<td>₹75,000</td>
+</tr>
+`;
+
+}
+
+
+/* PROFIT FORECAST */
+
+function generateProfit(){
+
+var table=document.getElementById("profitTable");
+
+table.innerHTML=`
+
+<tr>
+<th>Crop</th>
+<th>Revenue</th>
+<th>Cost</th>
+<th>Profit</th>
+</tr>
+
+<tr>
+<td>Rice</td>
+<td>₹94,500</td>
+<td>₹50,000</td>
+<td>₹44,500</td>
+</tr>
+
+<tr>
+<td>Maize</td>
+<td>₹72,000</td>
+<td>₹40,000</td>
+<td>₹32,000</td>
+</tr>
+
+<tr>
+<td>Groundnut</td>
+<td>₹96,000</td>
+<td>₹55,000</td>
+<td>₹41,000</td>
+</tr>
+
+`;
+
+}
+
+</script>
+
+</body>
+</html>

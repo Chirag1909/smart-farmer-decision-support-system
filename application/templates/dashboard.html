@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Farmer Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-body">
+  <aside class="sidebar">
+    <h2>
+      <span><i class="bi bi-flower1"></i> Smart Farmer</span>
+      <button id="sidebar-toggle" class="icon-btn" title="Toggle sidebar"><i class="bi bi-layout-sidebar-inset"></i></button>
+    </h2>
+    <nav>
+      <button class="nav-item active" data-view="dashboard"><i class="bi bi-grid"></i> Dashboard</button>
+      <button class="nav-item" data-view="recommendation"><i class="bi bi-seedling"></i> Crop Recommendation</button>
+      <button class="nav-item" data-view="profit"><i class="bi bi-cash-coin"></i> Profit Analysis</button>
+      <button class="nav-item" data-view="mandi"><i class="bi bi-shop"></i> Market Prices</button>
+      <button class="nav-item" data-view="weather"><i class="bi bi-cloud-sun"></i> Weather</button>
+      <button class="nav-item" data-view="history"><i class="bi bi-clock-history"></i> History</button>
+    </nav>
+    <button id="logout-btn" class="danger"><i class="bi bi-box-arrow-left"></i> Logout</button>
+  </aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div class="mobile-topbar-left">
+        <button id="mobile-menu-toggle" class="icon-btn mobile-only" title="Open menu"><i class="bi bi-list"></i></button>
+      </div>
+      <h1 id="view-title">Dashboard</h1>
+      <div class="topbar-actions">
+        <button id="density-toggle" class="icon-btn" title="Toggle density"><i class="bi bi-distribute-vertical"></i></button>
+        <button id="theme-toggle" class="icon-btn" title="Toggle theme"><i class="bi bi-moon-stars"></i></button>
+        <select id="state-select"></select>
+        <button id="refresh-btn"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+      </div>
+    </header>
+
+    <section id="loading" class="loading-banner hidden"><i class="bi bi-arrow-repeat spin"></i> Loading data...</section>
+
+    <section id="dashboard" class="view-section">
+      <div class="grid">
+        <div class="card kpi-card"><h3><i class="bi bi-trophy"></i> Best Crop</h3><p id="best-crop">-</p></div>
+        <div class="card kpi-card"><h3><i class="bi bi-graph-up-arrow"></i> Expected Revenue</h3><p id="best-revenue">-</p></div>
+        <div class="card kpi-card"><h3><i class="bi bi-currency-rupee"></i> Expected Profit</h3><p id="best-profit">-</p></div>
+        <div class="card kpi-card"><h3><i class="bi bi-percent"></i> Profit Margin</h3><p id="best-margin">-</p></div>
+      </div>
+      <div class="card">
+        <h3>Top Crop Profit Forecast</h3>
+        <div class="chart-wrap"><canvas id="profit-chart"></canvas></div>
+      </div>
+      <div class="grid chart-grid">
+        <div class="card">
+          <h3>Revenue vs Cost</h3>
+          <div class="chart-wrap"><canvas id="revenue-cost-chart"></canvas></div>
+        </div>
+        <div class="card">
+          <h3>Yield and Price Trend</h3>
+          <div class="chart-wrap"><canvas id="yield-price-chart"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="recommendation" class="view-section hidden">
+      <div class="grid">
+        <div class="card kpi-card"><h3><i class="bi bi-award"></i> Top Recommended Crop</h3><p id="rec-top-crop">-</p></div>
+        <div class="card kpi-card"><h3><i class="bi bi-bar-chart"></i> Avg Predicted Yield</h3><p id="rec-avg-yield">-</p></div>
+        <div class="card kpi-card"><h3><i class="bi bi-cash-stack"></i> Avg Modal Price</h3><p id="rec-avg-price">-</p></div>
+      </div>
+      <div class="grid chart-grid">
+        <div class="card">
+          <h3>Predicted Yield per Crop</h3>
+          <div class="chart-wrap"><canvas id="rec-yield-chart"></canvas></div>
+        </div>
+        <div class="card">
+          <h3>Modal Price per Crop</h3>
+          <div class="chart-wrap"><canvas id="rec-price-chart"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Yield vs Price Trend</h3>
+        <div class="chart-wrap"><canvas id="rec-yield-price-trend-chart"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Top Crop Recommendations</h3>
+        <div class="table-wrap">
+          <table id="recommend-table"><thead><tr><th>Crop</th><th>Predicted Yield</th><th>Price</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </section>
+
+    <section id="profit" class="view-section hidden">
+      <div class="grid">
+        <div class="card kpi-card"><h3><i class="bi bi-trophy"></i> Best Crop</h3><p id="profit-best-crop">-</p></div>
+        <div class="card kpi-card"><h3><i class="bi bi-currency-rupee"></i> Total Expected Profit</h3><p id="profit-total">-</p></div>
+        <div class="card kpi-card"><h3><i class="bi bi-percent"></i> Avg Profit Margin</h3><p id="profit-avg-margin">-</p></div>
+      </div>
+      <div class="grid chart-grid">
+        <div class="card">
+          <h3>Profit per Crop</h3>
+          <div class="chart-wrap"><canvas id="profit-crop-bar-chart"></canvas></div>
+        </div>
+        <div class="card">
+          <h3>Revenue vs Cost</h3>
+          <div class="chart-wrap"><canvas id="profit-revenue-cost-line-chart"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Profit Distribution</h3>
+        <div class="chart-wrap"><canvas id="profit-distribution-pie-chart"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Top Crops Profit Table</h3>
+        <div class="table-wrap">
+          <table id="profit-table">
+          <thead>
+            <tr>
+              <th>Crop</th>
+              <th>Revenue</th>
+              <th>Cost</th>
+              <th>Profit</th>
+              <th>Margin %</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="mandi" class="view-section hidden">
+      <div class="grid">
+        <div class="card kpi-card"><h3><i class="bi bi-tag"></i> Highest Price Crop</h3><p id="mandi-highest-crop">-</p></div>
+        <div class="card kpi-card"><h3><i class="bi bi-shop"></i> Best Market</h3><p id="mandi-best-market">-</p></div>
+        <div class="card kpi-card"><h3><i class="bi bi-graph-up"></i> Average Price</h3><p id="mandi-average-price">-</p></div>
+      </div>
+      <div class="grid chart-grid">
+        <div class="card">
+          <h3>Price per Crop</h3>
+          <div class="chart-wrap"><canvas id="mandi-price-per-crop-chart"></canvas></div>
+        </div>
+        <div class="card">
+          <h3>Top 10 Markets by Price</h3>
+          <div class="chart-wrap"><canvas id="mandi-top-markets-chart"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Price Trend by Date</h3>
+        <div class="chart-wrap"><canvas id="mandi-price-trend-chart"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Mandi Price Comparison</h3>
+        <input id="crop-filter" type="text" placeholder="Optional crop filter (e.g. Wheat)" />
+        <button id="load-mandi-btn">Load Markets</button>
+        <p id="best-mandi"></p>
+        <div class="table-wrap">
+          <table id="mandi-table">
+          <thead>
+            <tr>
+              <th data-sort="market">Market</th>
+              <th data-sort="district">District</th>
+              <th data-sort="crop">Crop</th>
+              <th data-sort="modal_price">Modal Price</th>
+              <th data-sort="date">Date</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="weather" class="view-section hidden">
+      <div class="grid">
+        <div class="card"><h3>Temperature</h3><p id="weather-temp">-</p></div>
+        <div class="card"><h3>Humidity</h3><p id="weather-humidity">-</p></div>
+        <div class="card"><h3>Condition</h3><p id="weather-condition">-</p></div>
+        <div class="card"><h3>Source</h3><p id="weather-source">-</p></div>
+        <div class="card"><h3>7-Day Rainfall Total</h3><p id="weather-rain-total">-</p></div>
+        <div class="card"><h3>Avg Daily Rainfall</h3><p id="weather-rain-avg">-</p></div>
+        <div class="card"><h3>Peak Daily Rainfall</h3><p id="weather-rain-max">-</p></div>
+      </div>
+      <div class="grid chart-grid">
+        <div class="card">
+          <h3>7-Day Rainfall Forecast</h3>
+          <div class="chart-wrap"><canvas id="weather-rainfall-chart"></canvas></div>
+        </div>
+        <div class="card">
+          <h3>7-Day Temperature Trend</h3>
+          <div class="chart-wrap"><canvas id="weather-temp-chart"></canvas></div>
+        </div>
+      </div>
+      <div class="card"><p id="weather-error"></p></div>
+    </section>
+
+    <section id="history" class="view-section hidden">
+      <div class="card">
+        <h3>Query History</h3>
+        <div class="table-wrap">
+          <table id="history-table"><thead><tr><th>State</th><th>Selected Crop</th><th>Predicted Profit</th><th>Timestamp</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="sidebar-backdrop" class="sidebar-backdrop hidden"></div>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

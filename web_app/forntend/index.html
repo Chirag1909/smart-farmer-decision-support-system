@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>FarmAI Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#f4f6fa;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:220px;
+height:100vh;
+background:#2e7d32;
+color:white;
+position:fixed;
+padding:20px;
+}
+
+.sidebar h2{
+margin-top:0;
+}
+
+.sidebar a{
+display:block;
+margin:14px 0;
+cursor:pointer;
+font-size:16px;
+}
+
+/* MAIN AREA */
+
+.main{
+margin-left:240px;
+padding:30px;
+}
+
+/* CARDS */
+
+.card{
+background:white;
+padding:20px;
+margin-bottom:20px;
+border-radius:8px;
+box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* GRID */
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+}
+
+/* TABLE */
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+th{
+background:#2e7d32;
+color:white;
+padding:10px;
+}
+
+td{
+border:1px solid #ddd;
+padding:10px;
+text-align:center;
+}
+
+/* BUTTON */
+
+button{
+background:#2e7d32;
+color:white;
+border:none;
+padding:10px 15px;
+cursor:pointer;
+border-radius:4px;
+}
+
+/* DROPDOWN */
+
+select{
+padding:10px;
+margin-right:10px;
+}
+
+/* PAGE */
+
+.page{
+display:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+<h2>FarmAI</h2>
+
+<a onclick="showPage('dashboard')">Dashboard</a>
+<a onclick="showPage('recommend')">Crop Recommendation</a>
+<a onclick="showPage('weather')">Weather</a>
+
+</div>
+
+
+<!-- MAIN -->
+
+<div class="main">
+
+<!-- DASHBOARD -->
+
+<div id="dashboard" class="page">
+
+<div class="card">
+
+<h3>Select State</h3>
+
+<select id="stateSelect"></select>
+
+<button onclick="getRecommendation()">Generate Recommendation</button>
+
+</div>
+
+
+<div class="grid">
+
+<div class="card">
+
+<h3>Profit Forecast</h3>
+
+<canvas id="chart"></canvas>
+
+</div>
+
+
+<div class="card">
+
+<h3>Weather</h3>
+
+<button onclick="getWeather()">Get Weather</button>
+
+<p id="temp"></p>
+<p id="humidity"></p>
+<p id="condition"></p>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- CROP PAGE -->
+
+<div id="recommend" class="page">
+
+<div class="card">
+
+<h3>Top 5 Crop Recommendations</h3>
+
+<table id="table">
+
+<tr>
+<th>Rank</th>
+<th>Crop</th>
+<th>Revenue</th>
+<th>Profit</th>
+<th>Best Mandi</th>
+</tr>
+
+</table>
+
+</div>
+
+</div>
+
+
+<!-- WEATHER PAGE -->
+
+<div id="weather" class="page">
+
+<div class="card">
+
+<h3>Weather Information</h3>
+
+<button onclick="getWeather()">Get Weather</button>
+
+<p id="temp2"></p>
+<p id="humidity2"></p>
+<p id="condition2"></p>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+const API="http://127.0.0.1:8000"
+
+let chart=null
+
+function showPage(page){
+
+document.querySelectorAll(".page").forEach(p=>p.style.display="none")
+
+document.getElementById(page).style.display="block"
+
+}
+
+showPage("dashboard")
+
+
+
+/* LOAD STATES */
+
+async function loadStates(){
+
+let res=await fetch(API+"/states")
+
+let states=await res.json()
+
+let html=""
+
+states.forEach(s=>{
+html+=`<option>${s}</option>`
+})
+
+document.getElementById("stateSelect").innerHTML=html
+
+}
+
+loadStates()
+
+
+
+/* RECOMMENDATION */
+
+async function getRecommendation(){
+
+let state=document.getElementById("stateSelect").value
+
+let res=await fetch(API+"/recommend/"+state)
+
+let data=await res.json()
+
+let html=`
+
+<tr>
+<th>Rank</th>
+<th>Crop</th>
+<th>Revenue</th>
+<th>Profit</th>
+<th>Best Mandi</th>
+</tr>
+`
+
+let crops=[]
+let profits=[]
+
+data.forEach((item,index)=>{
+
+html+=`
+
+<tr>
+<td>${index+1}</td>
+<td>${item.crop}</td>
+<td>₹${item.revenue}</td>
+<td>₹${item.profit}</td>
+<td>${item.mandi}</td>
+</tr>
+
+`
+
+crops.push(item.crop)
+profits.push(item.profit)
+
+})
+
+document.getElementById("table").innerHTML=html
+
+drawChart(crops,profits)
+
+showPage("recommend")
+
+}
+
+
+/* CHART */
+
+function drawChart(crops,profits){
+
+if(chart!=null){
+chart.destroy()
+}
+
+chart=new Chart(document.getElementById("chart"),{
+
+type:"bar",
+
+data:{
+labels:crops,
+datasets:[{
+label:"Profit Prediction",
+data:profits
+}]
+}
+
+})
+
+}
+
+
+/* WEATHER */
+
+async function getWeather(){
+
+let state=document.getElementById("stateSelect").value
+
+let res=await fetch(API+"/weather/"+state)
+
+let data=await res.json()
+
+document.getElementById("temp").innerText="Temperature: "+data.temp+" °C"
+document.getElementById("humidity").innerText="Humidity: "+data.humidity+"%"
+document.getElementById("condition").innerText="Condition: "+data.condition
+
+document.getElementById("temp2").innerText="Temperature: "+data.temp+" °C"
+document.getElementById("humidity2").innerText="Humidity: "+data.humidity+"%"
+document.getElementById("condition2").innerText="Condition: "+data.condition
+
+}
+
+</script>
+
+</body>
+
+</html>

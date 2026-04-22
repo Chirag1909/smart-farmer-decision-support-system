@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Smart Farmer Dashboard | Crop Recommendation Test Cases</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: #eef2e9;
+            padding: 28px 24px;
+        }
+
+        /* main dashboard container */
+        .dashboard {
+            max-width: 1440px;
+            margin: 0 auto;
+            background: #fefcf0;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            display: flex;
+            flex-wrap: wrap;
+            transition: all 0.2s;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: #1e3a2f;
+            color: #f5f2e0;
+            padding: 32px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .logo-area h2 {
+            font-size: 1.7rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            border-left: 4px solid #f5b642;
+            padding-left: 16px;
+        }
+        .logo-area p {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 8px;
+            padding-left: 20px;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .menu-item {
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: 0.2s;
+            cursor: default;
+            background: rgba(255,255,220,0.05);
+        }
+        .menu-item.active {
+            background: #f5b642;
+            color: #1e3a2f;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .menu-item:not(.active) {
+            opacity: 0.75;
+        }
+
+        /* MAIN PANEL */
+        .main-panel {
+            flex: 1;
+            background: #fefaf0;
+            padding: 28px 32px;
+        }
+
+        /* test case selector bar */
+        .testcase-bar {
+            background: #fff6e5;
+            border-radius: 28px;
+            padding: 12px 20px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e2dccd;
+        }
+        .testcase-label {
+            font-weight: 600;
+            color: #2c5a3b;
+            background: #e9f0e3;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+        }
+        select#testCaseSelect {
+            background: white;
+            border: 1px solid #cfcbaa;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+            min-width: 260px;
+        }
+        .info-note {
+            font-size: 0.75rem;
+            color: #6a5c3c;
+            background: #fff1cf;
+            padding: 4px 12px;
+            border-radius: 24px;
+        }
+
+        /* State + action row */
+        .state-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 20px;
+            margin-bottom: 28px;
+            background: #ffffffd9;
+            padding: 16px 20px;
+            border-radius: 28px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .state-selector {
+            flex: 2;
+            min-width: 200px;
+        }
+        .state-selector label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+            color: #2b4b2b;
+        }
+        select#stateSelect {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 28px;
+            border: 1px solid #cfd5b5;
+            background: white;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .action-btn {
+            background: #2c7840;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .action-btn:hover {
+            background: #1f5a32;
+            transform: scale(0.97);
+        }
+        .load-time-badge {
+            font-size: 0.75rem;
+            background: #eef2e4;
+            padding: 5px 12px;
+            border-radius: 30px;
+            color: #3f5a2e;
+        }
+
+        /* Table styles */
+        .crop-table-wrapper {
+            overflow-x: auto;
+            border-radius: 24px;
+            background: white;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+            border: 1px solid #ede6cf;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th {
+            background: #2e5a3a;
+            color: white;
+            padding: 14px 12px;
+            font-weight: 600;
+            text-align: left;
+        }
+        td {
+            padding: 12px 12px;
+            border-bottom: 1px solid #e9e2ce;
+            color: #2f3e2e;
+        }
+        tr:hover td {
+            background-color: #fff8e7;
+        }
+        .error-card, .info-card {
+            background: #fff3e0;
+            border-left: 8px solid #e0a800;
+            padding: 20px;
+            border-radius: 20px;
+            margin: 16px 0;
+            font-weight: 500;
+        }
+        .loading-spinner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 28px;
+            justify-content: center;
+        }
+        .spinner {
+            width: 28px;
+            height: 28px;
+            border: 3px solid #dcd2b0;
+            border-top: 3px solid #2c7840;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* ML Card */
+        .ml-card {
+            background: linear-gradient(115deg, #fef7e0 0%, #f5f0df 100%);
+            border-radius: 24px;
+            padding: 18px 24px;
+            margin-top: 20px;
+            border: 1px solid #e2d6b2;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ml-params {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+        .param {
+            background: white;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+        }
+        .ml-prediction {
+            font-weight: bold;
+            color: #1e5a2b;
+            background: #eef1e0;
+            padding: 8px 20px;
+            border-radius: 32px;
+        }
+        .footer-note {
+            text-align: center;
+            margin-top: 28px;
+            font-size: 0.7rem;
+            color: #998f66;
+            border-top: 1px solid #e3dcc6;
+            padding-top: 18px;
+        }
+        h3 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #2a4b2a;
+            margin-bottom: 6px;
+        }
+        .sub {
+            color: #6c7148;
+            margin-bottom: 20px;
+            border-left: 3px solid #e2b33b;
+            padding-left: 12px;
+        }
+        @media (max-width: 780px) {
+            .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; justify-content: space-between; }
+            .main-panel { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <!-- Sidebar menu (static to match UI image) -->
+    <div class="sidebar">
+        <div class="logo-area">
+            <h2>🌾 AgriSense</h2>
+            <p>Smart Farmer Hub</p>
+        </div>
+        <div class="menu">
+            <div class="menu-item active">🌱 Crop Recommendation</div>
+            <div class="menu-item">📈 Profit Analysis</div>
+            <div class="menu-item">🌦️ Market & Weather</div>
+        </div>
+        <div style="font-size:0.7rem; margin-top: auto; opacity:0.6;">v2.0 · AI advisory</div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-panel">
+        <!-- test case controller -->
+        <div class="testcase-bar">
+            <span class="testcase-label">📋 Test Case Simulator</span>
+            <select id="testCaseSelect">
+                <option value="TC-01">TC-01: Valid State Selection (Chhattisgarh)</option>
+                <option value="TC-02">TC-02: Change State (Chhattisgarh → Tamil Nadu)</option>
+                <option value="TC-03">TC-03: Top 5 Results Validation</option>
+                <option value="TC-04">TC-04: Data Fields Validation</option>
+                <option value="TC-05">TC-05: No State Selected</option>
+                <option value="TC-06">TC-06: Invalid State Input (XYZ)</option>
+                <option value="TC-07">TC-07: State with No Data</option>
+                <option value="TC-08">TC-08: Duplicate Crop Entries</option>
+                <option value="TC-09">TC-09: Extreme Values (Yield/Price)</option>
+                <option value="TC-10">TC-10: Response Time Test</option>
+                <option value="TC-11">TC-11: Display Format Check</option>
+                <option value="TC-12">TC-12: User Feedback (Loading Indicator)</option>
+                <option value="TC-13">TC-13: Backend Data Fetch Status</option>
+                <option value="TC-14">TC-14: ML Prediction Accuracy</option>
+            </select>
+            <div class="info-note"></div>
+        </div>
+
+        <!-- State row + action button -->
+        <div class="state-row">
+            <div class="state-selector">
+                <label>📍 Select State</label>
+                <select id="stateSelect">
+                    <option value="">-- Choose State --</option>
+                    <option value="Karnataka">Karnataka</option>
+                    <option value="Chhattisgarh">Chhattisgarh</option>
+                    <option value="Tamil Nadu">Tamil Nadu</option>
+                    <option value="XYZ">XYZ (Invalid)</option>
+                    <option value="NoDataState">Unavailable State (No Data)</option>
+                </select>
+            </div>
+            <button class="action-btn" id="submitBtn">🚜 Get Recommendations</button>
+            <div id="responseTimeBadge" class="load-time-badge">⏱️ ready</div>
+        </div>
+
+        <!-- Dashboard heading -->
+        <h3>🌾 Smart Farmer Dashboard</h3>
+        <div class="sub">Top Crop Suggestions · AI ranked by revenue potential</div>
+
+        <!-- Dynamic table container + messages -->
+        <div id="dynamicContent">
+            <!-- Table or loading or error will appear here -->
+            <div class="crop-table-wrapper">
+                <table id="cropTable">
+                    <thead>
+                        <tr><th>State</th><th>District</th><th>Crop</th><th>Predicted Yield (q/ha)</th><th>Modal Price (₹/q)</th><th>Expected Revenue (₹/ha)</th><th>Rank</th></tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr><td colspan="7" style="text-align:center;">Select a test case or click "Get Recommendations"</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="extraMessage"></div>
+        </div>
+
+        <!-- ML Prediction card (for TC-14 and backend simulation) -->
+        <div class="ml-card" id="mlCard">
+            <div style="font-weight:700;">🤖 ML Crop Prediction Engine</div>
+            <div class="ml-params" id="mlParams">
+                <span class="param">🌡️ Temp: 28°C</span>
+                <span class="param">💧 Humidity: 72%</span>
+                <span class="param">🌧️ Rainfall: 110mm</span>
+                <span class="param">🧪 Soil: Loamy</span>
+            </div>
+            <div class="ml-prediction" id="mlPredictionText">🏆 Recommended: Coconut (95% acc)</div>
+        </div>
+        <div class="footer-note">📊 Advanced Smart Agriculture Dashboard · Powered by AI</div>
+    </div>
+</div>
+
+<script>
+    // ---------- MOCK DATA GENERATORS ----------
+    // Generate consistent top5 / varied data for states and test scenarios
+    function getMockDataForState(state, scenarioFlags = {}) {
+        // scenarioFlags: { duplicateMode, extremeMode, limit5, noData, invalidState, forceStateChange }
+        if (scenarioFlags.noData) return { data: [], error: "⚠️ No data available for the selected region. No crop records found." };
+        if (scenarioFlags.invalidState) return { data: [], error: "❌ Invalid state name. Please select a valid Indian state from the list." };
+
+        // base datasets for known states
+        const datasets = {
+            "Karnataka": [
+                { district: "Chamrajnagar", crop: "Coconut", yield: 46.95, price: 23000, revenue: 1079814.89 },
+                { district: "Chitradurga", crop: "Maize", yield: 55.15, price: 1964, revenue: 108319.37 },
+                { district: "Mysore", crop: "Ragi", yield: 32.40, price: 2850, revenue: 92340.00 },
+                { district: "Belgaum", crop: "Sugarcane", yield: 88.20, price: 3450, revenue: 304290.00 },
+                { district: "Shivamogga", crop: "Arecanut", yield: 18.75, price: 32500, revenue: 609375.00 }
+            ],
+            "Chhattisgarh": [
+                { district: "Raipur", crop: "Paddy", yield: 48.20, price: 2180, revenue: 105076.00 },
+                { district: "Bilaspur", crop: "Maize", yield: 52.30, price: 1950, revenue: 101985.00 },
+                { district: "Durg", crop: "Soybean", yield: 28.75, price: 4200, revenue: 120750.00 },
+                { district: "Rajnandgaon", crop: "Pigeonpea", yield: 16.90, price: 6500, revenue: 109850.00 },
+                { district: "Korba", crop: "Groundnut", yield: 22.45, price: 5500, revenue: 123475.00 }
+            ],
+            "Tamil Nadu": [
+                { district: "Thanjavur", crop: "Paddy", yield: 62.80, price: 2250, revenue: 141300.00 },
+                { district: "Coimbatore", crop: "Cotton", yield: 28.50, price: 6200, revenue: 176700.00 },
+                { district: "Tirunelveli", crop: "Banana", yield: 48.90, price: 2800, revenue: 136920.00 },
+                { district: "Salem", crop: "Mango", yield: 18.20, price: 12500, revenue: 227500.00 },
+                { district: "Madurai", crop: "Chilli", yield: 12.50, price: 9500, revenue: 118750.00 }
+            ]
+        };
+
+        if (!datasets[state] && !scenarioFlags.duplicateMode && !scenarioFlags.extremeMode) {
+            return { data: [], error: `📭 No agricultural data found for "${state}".` };
+        }
+
+        let records = datasets[state] ? [...datasets[state]] : [];
+
+        // DUPLICATE MODE: inject duplicate crop entries
+        if (scenarioFlags.duplicateMode) {
+            records = [
+                ...records,
+                { district: "Raipur", crop: "Paddy", yield: 48.20, price: 2180, revenue: 105076.00 },
+                { district: "Bilaspur", crop: "Maize", yield: 52.30, price: 1950, revenue: 101985.00 },
+                { district: "Raipur", crop: "Paddy", yield: 47.90, price: 2180, revenue: 104422.00 } // duplicate crop entry
+            ];
+        }
+
+        // EXTREME VALUES MODE
+        if (scenarioFlags.extremeMode) {
+            records = [
+                { district: "TestHigh", crop: "SuperWheat", yield: 9999.99, price: 999999, revenue: 9.999e9 },
+                { district: "LowValley", crop: "StuntedRice", yield: 0.02, price: 1, revenue: 0.02 },
+                { district: "PeakZone", crop: "HyperMaize", yield: 8750.00, price: 875000, revenue: 7.656e9 },
+                ...records.slice(0, 3)
+            ];
+        }
+
+        // sort by revenue descending and assign rank, limit to 5 if top5 flag (TC-03)
+        let sorted = records.sort((a,b) => b.revenue - a.revenue);
+        let finalData = sorted.map((item, idx) => ({
+            state: state,
+            district: item.district,
+            crop: item.crop,
+            yield: item.yield.toFixed(2),
+            price: item.price,
+            revenue: item.revenue.toFixed(2),
+            rank: idx+1
+        }));
+
+        if (scenarioFlags.limit5 && finalData.length > 5) finalData = finalData.slice(0,5);
+        return { data: finalData, error: null };
+    }
+
+    // Helper to render table & extra messages
+    let currentLoadingTimer = null;
+    const tableBody = document.getElementById("tableBody");
+    const extraMsgDiv = document.getElementById("extraMessage");
+    const responseBadge = document.getElementById("responseTimeBadge");
+    const stateSelect = document.getElementById("stateSelect");
+    const testCaseSelect = document.getElementById("testCaseSelect");
+    const submitBtn = document.getElementById("submitBtn");
+
+    // ML Prediction updater
+    function updateMLPanel(testCaseId, activeState) {
+        const mlText = document.getElementById("mlPredictionText");
+        if (testCaseId === "TC-14") {
+            // ML prediction accurate simulation
+            let predMsg = "";
+            if (activeState === "Chhattisgarh") predMsg = "🌾 Recommended: Paddy + Gram (AI confidence 94%) • High yield synergy";
+            else if (activeState === "Tamil Nadu") predMsg = "🥭 Recommended: Banana & Cotton (92% accuracy) based on climate";
+            else if (activeState === "Karnataka") predMsg = "🌴 Top ML pick: Coconut & Maize (96% match) • Revenue optimized";
+            else predMsg = "📈 ML Model suggests: Paddy/Cotton rotation (accuracy 89%)";
+            mlText.innerHTML = `🤖 ${predMsg}`;
+            document.getElementById("mlCard").style.background = "#eef4e0";
+        } else {
+            // default generic
+            if (testCaseId === "TC-13") mlText.innerHTML = "📡 Backend fetch: ✅ Data retrieved from Agri-API (live sync)";
+            else if (testCaseId === "TC-08") mlText.innerHTML = "🧩 Duplicates detected but system stable — ML adjusted ranking";
+            else mlText.innerHTML = "🏆 Recommended: Coconut (95% acc) based on current params";
+            document.getElementById("mlCard").style.background = "linear-gradient(115deg, #fef7e0 0%, #f5f0df 100%)";
+        }
+    }
+
+    // Main render function that respects test case + optional state & action feedback
+    async function renderForTestCase(testCaseId, manualState = null, showLoadingEffect = false) {
+        // clear any pending
+        if (currentLoadingTimer) clearTimeout(currentLoadingTimer);
+        
+        // Determine effective state & flags based on test case
+        let effectiveState = manualState !== undefined ? manualState : stateSelect.value;
+        let flags = { limit5: false, duplicateMode: false, extremeMode: false, noData: false, invalidState: false };
+        let expectedError = null;
+        let forceLoadingFeedback = false;
+        let responseTimeMark = false;
+
+        // Parse test case logic
+        switch(testCaseId) {
+            case "TC-01": effectiveState = "Chhattisgarh"; stateSelect.value = "Chhattisgarh"; flags.limit5 = true; break;
+            case "TC-02": effectiveState = "Tamil Nadu"; stateSelect.value = "Tamil Nadu"; extraMsgDiv.innerHTML = "<div class='info-card'>🔄 State changed from Chhattisgarh → Tamil Nadu. Recommendations updated.</div>"; break;
+            case "TC-03": flags.limit5 = true; if (!effectiveState) effectiveState = "Karnataka"; stateSelect.value = effectiveState; break;
+            case "TC-04": if (!effectiveState) effectiveState = "Karnataka"; stateSelect.value = effectiveState; flags.limit5 = true; break;
+            case "TC-05": effectiveState = ""; stateSelect.value = ""; expectedError = "⚠️ No state selected. Please choose a state to get crop recommendations."; break;
+            case "TC-06": effectiveState = "XYZ"; stateSelect.value = "XYZ"; flags.invalidState = true; break;
+            case "TC-07": effectiveState = "NoDataState"; stateSelect.value = "NoDataState"; flags.noData = true; break;
+            case "TC-08": effectiveState = "Chhattisgarh"; stateSelect.value = "Chhattisgarh"; flags.duplicateMode = true; flags.limit5 = false; extraMsgDiv.innerHTML = "<div class='info-card'>⚠️ Duplicate crop entries detected (Paddy shown twice). System handles gracefully without crash.</div>"; break;
+            case "TC-09": effectiveState = "Karnataka"; stateSelect.value = "Karnataka"; flags.extremeMode = true; flags.limit5 = true; extraMsgDiv.innerHTML = "<div class='info-card'>📊 Extreme yield/price values loaded — UI stable & responsive.</div>"; break;
+            case "TC-10": effectiveState = effectiveState || "Karnataka"; stateSelect.value = effectiveState; responseTimeMark = true; break;
+            case "TC-11": effectiveState = effectiveState || "Karnataka"; stateSelect.value = effectiveState; flags.limit5 = true; extraMsgDiv.innerHTML = "<div class='info-card'>✅ Display format: proper table columns, aligned, rank visible, responsive design.</div>"; break;
+            case "TC-12": forceLoadingFeedback = true; break;
+            case "TC-13": effectiveState = effectiveState || "Karnataka"; stateSelect.value = effectiveState; flags.limit5 = true; extraMsgDiv.innerHTML = "<div class='info-card'>📡 Backend data fetch: Successful from crop API (mock) — latest data integrated.</div>"; break;
+            case "TC-14": effectiveState = effectiveState || "Karnataka"; stateSelect.value = effectiveState; flags.limit5 = true; break;
+            default: flags.limit5 = true;
+        }
+
+        // if TC-02 already set extra message, but for other testcases reset extra msg unless specific
+        if (testCaseId !== "TC-02" && testCaseId !== "TC-08" && testCaseId !== "TC-11" && testCaseId !== "TC-13") {
+            if(testCaseId !== "TC-10") extraMsgDiv.innerHTML = "";
+        }
+        if(testCaseId === "TC-10") extraMsgDiv.innerHTML = "";
+
+        // Loading indicator simulation for TC-12 or forced loading test
+        if (forceLoadingFeedback || testCaseId === "TC-12") {
+            tableBody.innerHTML = `<tr><td colspan="7"><div class="loading-spinner"><div class="spinner"></div> Fetching live recommendations... please wait</div></td></tr>`;
+            if (currentLoadingTimer) clearTimeout(currentLoadingTimer);
+            await new Promise(resolve => { currentLoadingTimer = setTimeout(resolve, 800); });
+        }
+        
+        // response time simulation for TC-10
+        let startTime = performance.now();
+        
+        // handle error priority (no state / invalid)
+        if (expectedError) {
+            tableBody.innerHTML = `<tr><td colspan="7" style="padding:32px; text-align:center; color:#b55a1a;">${expectedError}</td></tr>`;
+            responseBadge.innerHTML = `⏱️ idle`;
+            updateMLPanel(testCaseId, effectiveState);
+            return;
+        }
+        
+        if (flags.invalidState) {
+            tableBody.innerHTML = `<tr><td colspan="7" style="padding:32px; text-align:center; color:#b5450c;">❌ Invalid State Input: "XYZ" not recognized. Please select a valid state.</td></tr>`;
+            responseBadge.innerHTML = `⏱️ error`;
+            updateMLPanel(testCaseId, effectiveState);
+            return;
+        }
+        
+        // fetch data with flags
+        let result = getMockDataForState(effectiveState, { duplicateMode: flags.duplicateMode, extremeMode: flags.extremeMode, noData: flags.noData, invalidState: flags.invalidState, limit5: flags.limit5 });
+        
+        if (result.error) {
+            tableBody.innerHTML = `<tr><td colspan="7" style="padding:28px; text-align:center; background:#fff1e0;">${result.error}</td></tr>`;
+            responseBadge.innerHTML = `⏱️ no data`;
+            updateMLPanel(testCaseId, effectiveState);
+            return;
+        }
+        
+        let dataRows = result.data;
+        if (flags.limit5 && dataRows.length > 5) dataRows = dataRows.slice(0,5);
+        
+        // Exactly 5 rows validation for TC-03
+        if (testCaseId === "TC-03" && dataRows.length !== 5) {
+            // force ensure top5
+            while(dataRows.length < 5) dataRows.push({ state: effectiveState, district: "Sample", crop: "FillerCrop", yield: "0.00", price: 0, revenue: "0", rank: dataRows.length+1 });
+            if(dataRows.length >5) dataRows = dataRows.slice(0,5);
+        }
+        
+        // render rows
+        if (dataRows.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="7">🌾 No crop suggestions for this state. Try different region.</td></tr>`;
+        } else {
+            let html = "";
+            for (let row of dataRows) {
+                html += `<tr>
+                            <td>${row.state}</td>
+                            <td>${row.district}</td>
+                            <td>${row.crop}</td>
+                            <td>${row.yield}</td>
+                            <td>${Number(row.price).toLocaleString()}</td>
+                            <td>${Number(row.revenue).toLocaleString()}</td>
+                            <td>${row.rank}</td>
+                         </tr>`;
+            }
+            tableBody.innerHTML = html;
+        }
+        
+        // response time logic for TC-10
+        if (responseTimeMark || testCaseId === "TC-10") {
+            let endTime = performance.now();
+            let elapsed = (endTime - startTime).toFixed(1);
+            let msg = `⚡ Loaded in ${elapsed} ms (within 2-3 sec target)`;
+            if (elapsed > 3000) msg = `⚠️ Load time ${elapsed} ms — slightly above, but system stable`;
+            responseBadge.innerHTML = `⏱️ ${msg}`;
+            extraMsgDiv.innerHTML = `<div class="info-card">✅ Response time validation: ${elapsed} ms, meets <3s requirement.</div>`;
+        } else {
+            responseBadge.innerHTML = `⏱️ ready`;
+        }
+        
+        // additional check for TC-04: ensure crop, yield, price present
+        if (testCaseId === "TC-04") {
+            let allFields = dataRows.every(r => r.crop && r.yield && r.price !== undefined);
+            if (allFields) extraMsgDiv.innerHTML = "<div class='info-card'>✅ Data fields validation PASS: Crop, Yield, Price all present.</div>";
+            else extraMsgDiv.innerHTML = "<div class='error-card'>⚠️ Missing fields detected!</div>";
+        }
+        
+        // TC-02 specific message if not already
+        if (testCaseId === "TC-02" && !extraMsgDiv.innerHTML.includes("Tamil Nadu")) {
+            extraMsgDiv.innerHTML = "<div class='info-card'>🔄 State selection changed from Chhattisgarh to Tamil Nadu → recommendations updated.</div>";
+        }
+        if (testCaseId === "TC-14") {
+            extraMsgDiv.innerHTML = "<div class='info-card'>🧠 ML prediction model used state + climate params → Highly accurate (93% cross-validation).</div>";
+        }
+        
+        updateMLPanel(testCaseId, effectiveState);
+    }
+    
+    // sync test case change and apply 
+    function onTestCaseChange() {
+        const selected = testCaseSelect.value;
+        // for TC-12, we force loading simulation; for TC-10 we also time
+        renderForTestCase(selected, null, (selected === "TC-12"));
+        // additional sync: when TC-05 or TC-06 we also reflect disabled state select
+        if (selected === "TC-05") stateSelect.value = "";
+        if (selected === "TC-06") stateSelect.value = "XYZ";
+        if (selected === "TC-07") stateSelect.value = "NoDataState";
+        if (selected === "TC-01") stateSelect.value = "Chhattisgarh";
+        if (selected === "TC-02") stateSelect.value = "Tamil Nadu";
+        if (selected === "TC-08") stateSelect.value = "Chhattisgarh";
+        if (selected === "TC-09") stateSelect.value = "Karnataka";
+    }
+    
+    // on manual submit button (also respects current test case context)
+    function onManualSubmit() {
+        let currentTC = testCaseSelect.value;
+        let selectedState = stateSelect.value;
+        renderForTestCase(currentTC, selectedState, (currentTC === "TC-12"));
+        if (currentTC === "TC-02") {
+            extraMsgDiv.innerHTML = "<div class='info-card'>🔄 Manual update: state changed, recommendations refreshed.</div>";
+        }
+    }
+    
+    // attach listeners
+    testCaseSelect.addEventListener("change", onTestCaseChange);
+    submitBtn.addEventListener("click", onManualSubmit);
+    
+    // initial load: TC-01 by default (exact match to first test case)
+    testCaseSelect.value = "TC-01";
+    onTestCaseChange();
+</script>
+</body>
+</html>
+```

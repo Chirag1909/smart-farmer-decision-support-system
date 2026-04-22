@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Farmer - Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body class="auth-body">
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="auth-card">
+    <div class="auth-badge"><i class="bi bi-flower1"></i> Smart Farmer DSS</div>
+    <h1>Welcome back</h1>
+    <p>Login to access crop intelligence dashboard</p>
+    <form id="login-form">
+      <label class="field-label">Username</label>
+      <input type="text" name="username" placeholder="Enter username" required />
+      <label class="field-label">Password</label>
+      <input type="password" name="password" placeholder="Enter password" required />
+      <button type="submit"><i class="bi bi-box-arrow-in-right"></i> Login</button>
+    </form>
+    <p class="auth-link">No account? <a href="/register-page">Register</a></p>
+    <p id="login-message" class="form-message"></p>
+  </div>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

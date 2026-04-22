@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+
+<h2>🌦 Weather Forecast</h2>
+
+<form method="POST">
+    <select name="state">
+        {% for s in states %}
+        <option>{{s}}</option>
+        {% endfor %}
+    </select>
+
+    <button>Get Weather</button>
+</form>
+
+{% if data %}
+<div class="card">
+    {% if data.error %}
+        <p>{{data.error}}</p>
+    {% else %}
+        <h3>Temperature: {{data.temp}} °C</h3>
+        <p>Humidity: {{data.humidity}} %</p>
+        <p>Condition: {{data.condition}}</p>
+        <p>Wind Speed: {{data.wind}} m/s</p>
+    {% endif %}
+</div>
+{% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>State: {{state}}</h2>
+
+<form method="POST">
+    <select name="state">
+        <option>Chhattisgarh</option>
+        <option>Maharashtra</option>
+        <option>Punjab</option>
+    </select>
+    <button>Update</button>
+</form>
+
+<h3>Top Crops</h3>
+
+<div class="grid">
+{% for crop in data.top_crops %}
+    <div class="card">
+        <h3>{{crop.crop}}</h3>
+        <p>Yield: {{crop.yield}}</p>
+        <p>Price: ₹ {{crop.price}}</p>
+    </div>
+{% endfor %}
+</div>
+
+<h3>Best Crop</h3>
+<div class="card highlight">
+    <h2>{{data.best_crop.name}}</h2>
+    <p>Profit: ₹ {{data.best_crop.profit}}</p>
+    <p>Margin: {{data.best_crop.margin}}%</p>
+</div>
+
+{% endblock %}

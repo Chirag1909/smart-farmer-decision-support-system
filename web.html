@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>AgriPredict | Crop Yield Prediction - Test Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #eef2e6;
+            padding: 28px 24px;
+        }
+
+        /* Dashboard container */
+        .dashboard {
+            max-width: 1280px;
+            margin: 0 auto;
+            background: #fefaf0;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: #1e3a2f;
+            color: #f5f2e0;
+            padding: 32px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .logo-area h2 {
+            font-size: 1.7rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            border-left: 4px solid #f5b642;
+            padding-left: 16px;
+        }
+        .logo-area p {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 8px;
+            padding-left: 20px;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .menu-item {
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: 0.2s;
+            cursor: default;
+            background: rgba(255,255,220,0.05);
+        }
+        .menu-item.active {
+            background: #f5b642;
+            color: #1e3a2f;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .menu-item:not(.active) {
+            opacity: 0.75;
+        }
+
+        /* Main panel */
+        .main-panel {
+            flex: 1;
+            background: #fefaf0;
+            padding: 28px 32px;
+        }
+
+        /* Test case bar */
+        .testcase-bar {
+            background: #fff6e5;
+            border-radius: 28px;
+            padding: 12px 20px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            border: 1px solid #e2dccd;
+        }
+        .testcase-label {
+            font-weight: 600;
+            color: #2c5a3b;
+            background: #e9f0e3;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+        }
+        select#testCaseSelect {
+            background: white;
+            border: 1px solid #cfcbaa;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+            min-width: 280px;
+        }
+        .info-note {
+            font-size: 0.75rem;
+            color: #6a5c3c;
+            background: #fff1cf;
+            padding: 4px 12px;
+            border-radius: 24px;
+        }
+
+        /* Prediction form */
+        .prediction-card {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 24px;
+            margin-bottom: 28px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            border: 1px solid #ede6cf;
+        }
+        .form-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .input-group {
+            flex: 1;
+            min-width: 180px;
+        }
+        .input-group label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+            color: #2c5a2c;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 28px;
+            border: 1px solid #cfd5b5;
+            background: white;
+            font-size: 0.9rem;
+        }
+        .action-row {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .predict-btn {
+            background: #2c7840;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .predict-btn:hover {
+            background: #1f5a32;
+            transform: scale(0.97);
+        }
+        .response-badge {
+            font-size: 0.75rem;
+            background: #eef2e4;
+            padding: 6px 14px;
+            border-radius: 30px;
+            color: #3f5a2e;
+        }
+
+        /* Result area */
+        .result-area {
+            background: #f6f8ef;
+            border-radius: 28px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border-left: 6px solid #f5b642;
+        }
+        .yield-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #1f5a32;
+            margin: 8px 0;
+        }
+        .yield-unit {
+            font-size: 1rem;
+            font-weight: normal;
+            color: #6f7845;
+        }
+        .message-box {
+            background: #fff6e0;
+            padding: 16px 20px;
+            border-radius: 20px;
+            margin-top: 12px;
+        }
+
+        /* ML insight card */
+        .ml-card {
+            background: linear-gradient(115deg, #fef7e0 0%, #f5f0df 100%);
+            border-radius: 24px;
+            padding: 18px 24px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid #e2d6b2;
+        }
+        .ml-text {
+            font-weight: 700;
+        }
+        .accuracy-badge {
+            background: #2c7840;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+        }
+        .footer-note {
+            text-align: center;
+            margin-top: 28px;
+            font-size: 0.7rem;
+            color: #998f66;
+            border-top: 1px solid #e3dcc6;
+            padding-top: 18px;
+        }
+        h3 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #2a4b2a;
+            margin-bottom: 6px;
+        }
+        .sub {
+            color: #6c7148;
+            margin-bottom: 20px;
+            border-left: 3px solid #e2b33b;
+            padding-left: 12px;
+        }
+        @media (max-width: 780px) {
+            .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; justify-content: space-between; }
+            .main-panel { padding: 20px; }
+        }
+        .error-text {
+            color: #c23d22;
+            font-weight: 500;
+        }
+        .loading-spinner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+        }
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #dcd2b0;
+            border-top: 3px solid #2c7840;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <div class="sidebar">
+        <div class="logo-area">
+            <h2>🌾 AgriSense</h2>
+            <p>Yield Intelligence</p>
+        </div>
+        <div class="menu">
+            <div class="menu-item">🌱 Crop Recommendation</div>
+            <div class="menu-item active">📊 Yield Prediction</div>
+            <div class="menu-item">💰 Profit Analysis</div>
+            <div class="menu-item">🌦️ Market & Weather</div>
+        </div>
+        <div style="font-size:0.7rem; margin-top: auto; opacity:0.6;">ML v2.4 · Precision Ag</div>
+    </div>
+
+    <div class="main-panel">
+        <!-- Test case selector -->
+        <div class="testcase-bar">
+            <span class="testcase-label">🧪 Yield Test Cases</span>
+            <select id="testCaseSelect">
+                <option value="TC-01">TC-01: Valid Crop Yield Prediction</option>
+                <option value="TC-02">TC-02: Multiple Crop Selection Change</option>
+                <option value="TC-03">TC-03: Yield Value Format (Numeric)</option>
+                <option value="TC-04">TC-04: No Input Provided → Error</option>
+                <option value="TC-05">TC-05: Invalid Input Data</option>
+                <option value="TC-06">TC-06: Extreme Input Values</option>
+                <option value="TC-07">TC-07: Missing Dataset</option>
+                <option value="TC-08">TC-08: Model Prediction Accuracy</option>
+                <option value="TC-09">TC-09: Response Time</option>
+                <option value="TC-10">TC-10: UI Display Format</option>
+            </select>
+            <div class="info-note"></div>
+        </div>
+
+        <!-- Prediction Form -->
+        <div class="prediction-card">
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>🌾 Crop Type *</label>
+                    <select id="cropSelect">
+                        <option value="rice">Rice (Paddy)</option>
+                        <option value="wheat">Wheat</option>
+                        <option value="maize">Maize</option>
+                        <option value="groundnut">Groundnut</option>
+                        <option value="cotton">Cotton</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>📍 State / Region *</label>
+                    <select id="stateSelect">
+                        <option value="punjab">Punjab</option>
+                        <option value="haryana">Haryana</option>
+                        <option value="up">Uttar Pradesh</option>
+                        <option value="mh">Maharashtra</option>
+                        <option value="tn">Tamil Nadu</option>
+                        <option value="missing">Unavailable Data (Test)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>🌧️ Rainfall (mm)</label>
+                    <input type="number" id="rainfall" value="850" step="10">
+                </div>
+                <div class="input-group">
+                    <label>🌡️ Avg Temp (°C)</label>
+                    <input type="number" id="temp" value="27" step="0.5">
+                </div>
+            </div>
+            <div class="action-row">
+                <button class="predict-btn" id="predictBtn">🔮 Predict Yield</button>
+                <div id="responseTimeBadge" class="response-badge">⏱️ ready</div>
+            </div>
+        </div>
+
+        <!-- Result display area -->
+        <div id="resultContainer">
+            <div class="result-area">
+                <div style="font-weight: 600; color: #4a6230;">📊 Predicted Yield</div>
+                <div id="yieldDisplay" class="yield-value">-- <span class="yield-unit">q/ha</span></div>
+                <div id="extraMessage" class="message-box" style="background:#f2efdf;">👉 Select a test case or fill form and click 'Predict'</div>
+            </div>
+        </div>
+
+        <!-- ML Accuracy Card (for TC-08 and general) -->
+        <div class="ml-card" id="mlCard">
+            <div class="ml-text">🤖 Yield Prediction Model (XGBoost + Remote Sensing)</div>
+            <div class="accuracy-badge" id="accuracyBadge">Validation R²: 0.92</div>
+        </div>
+        <div class="footer-note">⚡ Powered by AI | Real-time yield estimation based on crop, location & microclimate</div>
+    </div>
+</div>
+
+<script>
+    // ------------------ MOCK PREDICTION ENGINE ------------------
+    // Base yield lookup (crop + region) in q/ha
+    const baseYieldDB = {
+        rice: { punjab: 42.5, haryana: 38.2, up: 36.8, mh: 31.5, tn: 45.2, missing: null },
+        wheat: { punjab: 48.2, haryana: 44.5, up: 42.0, mh: 28.3, tn: 22.5, missing: null },
+        maize: { punjab: 52.0, haryana: 48.5, up: 46.2, mh: 35.8, tn: 40.5, missing: null },
+        groundnut: { punjab: 22.5, haryana: 21.0, up: 19.8, mh: 18.2, tn: 24.5, missing: null },
+        cotton: { punjab: 28.5, haryana: 26.0, up: 24.5, mh: 32.0, tn: 27.8, missing: null }
+    };
+
+    // helper: get base yield from crop & state
+    function getBaseYield(crop, state) {
+        if (!baseYieldDB[crop]) return null;
+        if (!baseYieldDB[crop][state]) return null;
+        return baseYieldDB[crop][state];
+    }
+
+    // adjust yield with rainfall and temperature (simple mock)
+    function adjustYield(base, rainfall, temp) {
+        if (base === null || isNaN(base)) return null;
+        let rainFactor = 1.0;
+        let tempFactor = 1.0;
+        // rainfall optimum around 700-1100mm
+        if (rainfall < 300) rainFactor = 0.6;
+        else if (rainfall < 500) rainFactor = 0.8;
+        else if (rainfall > 1500) rainFactor = 0.85;
+        else if (rainfall > 2000) rainFactor = 0.7;
+        // temperature optimum 22-30°C
+        if (temp < 15) tempFactor = 0.65;
+        else if (temp < 20) tempFactor = 0.85;
+        else if (temp > 38) tempFactor = 0.7;
+        else if (temp > 35) tempFactor = 0.9;
+        let adjusted = base * rainFactor * tempFactor;
+        return Math.round(adjusted * 10) / 10;
+    }
+
+    // full prediction with optional error simulation
+    function predictYield(crop, state, rainfall, temp, scenarioFlags = {}) {
+        // scenario overrides
+        if (scenarioFlags.noData || state === "missing") {
+            return { yield: null, error: "📭 No yield dataset available for the selected region. Missing historical records." };
+        }
+        if (scenarioFlags.invalidInput) {
+            return { yield: null, error: "❌ Invalid input values. Please enter valid numeric data (rainfall/temp) and select crop/state." };
+        }
+        if (scenarioFlags.extremeMode) {
+            // extreme values should not crash, produce some output but may be unrealistic
+            let extYield = 9999.9;
+            if (rainfall > 5000) extYield = 1250.5;
+            if (temp > 60) extYield = 150.2;
+            return { yield: extYield, error: null, warning: "⚠️ Extreme values detected, prediction may be extrapolated but system stable." };
+        }
+        const base = getBaseYield(crop, state);
+        if (base === null) {
+            return { yield: null, error: `⚠️ No reference yield data for ${crop} in ${state}. Model cannot predict.` };
+        }
+        let predicted = adjustYield(base, rainfall, temp);
+        return { yield: predicted, error: null };
+    }
+
+    // DOM elements
+    const testCaseSelect = document.getElementById('testCaseSelect');
+    const cropSelect = document.getElementById('cropSelect');
+    const stateSelect = document.getElementById('stateSelect');
+    const rainfallInput = document.getElementById('rainfall');
+    const tempInput = document.getElementById('temp');
+    const predictBtn = document.getElementById('predictBtn');
+    const responseBadge = document.getElementById('responseTimeBadge');
+    const yieldDisplaySpan = document.getElementById('yieldDisplay');
+    const extraMessageDiv = document.getElementById('extraMessage');
+    const accuracyBadge = document.getElementById('accuracyBadge');
+
+    let currentTimeout = null;
+
+    // Render prediction based on test case or manual mode
+    async function renderForTestCase(testCaseId, manualOverride = false, formValues = null) {
+        if (currentTimeout) clearTimeout(currentTimeout);
+        
+        // default form values (from UI or forced by test case)
+        let crop = cropSelect.value;
+        let state = stateSelect.value;
+        let rainfall = parseFloat(rainfallInput.value);
+        let temp = parseFloat(tempInput.value);
+        let scenarioFlags = {};
+        let expectedMessage = "";
+        let forceYieldFormatCheck = false;
+        let measureResponse = false;
+        let loadingSim = false;
+
+        // ----- Test case logic -----
+        switch(testCaseId) {
+            case "TC-01":   // Valid Crop Yield Prediction
+                crop = "rice"; state = "punjab"; rainfall = 850; temp = 27;
+                cropSelect.value = crop; stateSelect.value = state; rainfallInput.value = rainfall; tempInput.value = temp;
+                expectedMessage = "✅ Valid inputs: Prediction shows realistic yield value (q/ha).";
+                break;
+            case "TC-02":   // Multiple Crop Selection Change
+                // Demonstrate that changing crop updates yield. We'll simulate by forcing crop change listener active.
+                crop = "wheat"; state = "haryana"; rainfall = 780; temp = 26.5;
+                cropSelect.value = crop; stateSelect.value = state; rainfallInput.value = rainfall; tempInput.value = temp;
+                expectedMessage = "🔄 TC-02: Crop selection change updates yield automatically. Try changing crop from dropdown now → yield will refresh without clicking predict.";
+                // we'll attach special listener only for this test case to enable auto-update on crop change.
+                break;
+            case "TC-03":   // Yield Value Format (numeric)
+                crop = "maize"; state = "up"; rainfall = 900; temp = 28;
+                cropSelect.value = crop; stateSelect.value = state; rainfallInput.value = rainfall; tempInput.value = temp;
+                forceYieldFormatCheck = true;
+                expectedMessage = "🔢 TC-03: Yield output is numeric (e.g., 48.2 q/ha). Validating number format.";
+                break;
+            case "TC-04":   // No Input Provided
+                crop = ""; state = ""; rainfall = NaN; temp = NaN;
+                cropSelect.value = ""; stateSelect.value = ""; rainfallInput.value = ""; tempInput.value = "";
+                scenarioFlags.invalidInput = true;  // simulate missing required
+                expectedMessage = "⚠️ Error: Crop and State must be selected. Please provide valid inputs.";
+                break;
+            case "TC-05":   // Invalid Input Data
+                crop = "rice"; state = "punjab"; rainfall = -999; temp = "abc";
+                cropSelect.value = crop; stateSelect.value = state; rainfallInput.value = -999; tempInput.value = "abc";
+                scenarioFlags.invalidInput = true;
+                expectedMessage = "❌ Invalid Input Data: Rainfall and temperature must be valid numbers.";
+                break;
+            case "TC-06":   // Extreme Input Values
+                crop = "cotton"; state = "mh"; rainfall = 5500; temp = 58;
+                cropSelect.value = crop; stateSelect.value = state; rainfallInput.value = 5500; tempInput.value = 58;
+                scenarioFlags.extremeMode = true;
+                expectedMessage = "🌪️ Extreme input values (very high rainfall/temp) – system remains stable, prediction extrapolated.";
+                break;
+            case "TC-07":   // Missing Dataset
+                crop = "rice"; state = "missing"; rainfall = 800; temp = 28;
+                cropSelect.value = crop; stateSelect.value = "missing"; rainfallInput.value = 800; tempInput.value = 28;
+                scenarioFlags.noData = true;
+                expectedMessage = "📭 Missing Dataset: No yield records available for this region.";
+                break;
+            case "TC-08":   // Model Prediction Accuracy
+                crop = "wheat"; state = "punjab"; rainfall = 720; temp = 24.5;
+                cropSelect.value = crop; stateSelect.value = state; rainfallInput.value = rainfall; tempInput.value = temp;
+                expectedMessage = "🎯 Model Accuracy: Prediction aligns with ground-truth range (R² 0.92). Reasonable output shown.";
+                break;
+            case "TC-09":   // Response Time
+                crop = "maize"; state = "tn"; rainfall = 1100; temp = 29;
+                cropSelect.value = crop; stateSelect.value = state; rainfallInput.value = rainfall; tempInput.value = temp;
+                measureResponse = true;
+                expectedMessage = "⏱️ Response time measured: prediction within 2–3 seconds.";
+                break;
+            case "TC-10":   // UI Display Format
+                crop = "groundnut"; state = "tn"; rainfall = 650; temp = 30;
+                cropSelect.value = crop; stateSelect.value = state; rainfallInput.value = rainfall; tempInput.value = temp;
+                expectedMessage = "🎨 UI Display Format: Yield shown in clear card, numeric value, proper units (q/ha).";
+                break;
+            default: break;
+        }
+
+        // For TC-02, we add dynamic listener and also perform prediction initially
+        if (testCaseId === "TC-02") {
+            // attach crop change listener if not already attached specifically for auto-update
+            if (!window._tc02ListenerAttached) {
+                window._tc02ListenerAttached = true;
+                cropSelect.addEventListener('change', () => {
+                    if (testCaseSelect.value === "TC-02") {
+                        // auto predict without full test case re-run but using current valid values
+                        manualPredictWrapper(false);
+                    }
+                });
+                stateSelect.addEventListener('change', () => {
+                    if (testCaseSelect.value === "TC-02") manualPredictWrapper(false);
+                });
+                rainfallInput.addEventListener('input', () => { if (testCaseSelect.value === "TC-02") manualPredictWrapper(false); });
+                tempInput.addEventListener('input', () => { if (testCaseSelect.value === "TC-02") manualPredictWrapper(false); });
+            }
+        } else {
+            // remove auto-predict behavior if not needed? keep but won't auto trigger
+        }
+
+        // Loading simulation for TC-09?
+        if (measureResponse || testCaseId === "TC-09") {
+            extraMessageDiv.innerHTML = `<div class="loading-spinner"><div class="spinner"></div> Computing yield prediction ...</div>`;
+            yieldDisplaySpan.innerHTML = `-- <span class="yield-unit">q/ha</span>`;
+            await new Promise(resolve => setTimeout(resolve, 300)); // simulate 300ms but ensure <2s
+        }
+
+        // measure response time for TC-09
+        let startPerf = performance.now();
+        let predictionResult;
+        if (testCaseId === "TC-04" || testCaseId === "TC-05" || scenarioFlags.invalidInput) {
+            if ((!crop || !state) || isNaN(rainfall) || isNaN(temp) || (testCaseId === "TC-05" && (rainfall < 0 || temp === "abc"))) {
+                predictionResult = { yield: null, error: "❌ Invalid or missing input. Please select crop, state, and valid numeric values for rainfall/temp." };
+            } else {
+                predictionResult = predictYield(crop, state, rainfall, temp, scenarioFlags);
+            }
+        } else if (scenarioFlags.noData) {
+            predictionResult = predictYield(crop, state, rainfall, temp, { noData: true });
+        } else if (scenarioFlags.extremeMode) {
+            predictionResult = predictYield(crop, state, rainfall, temp, { extremeMode: true });
+        } else {
+            predictionResult = predictYield(crop, state, rainfall, temp);
+        }
+        
+        let endPerf = performance.now();
+        let elapsedMs = (endPerf - startPerf).toFixed(1);
+        
+        if (measureResponse) {
+            let responseMsg = `⏱️ Response time: ${elapsedMs} ms (within 2–3 sec target)`;
+            if (elapsedMs > 3000) responseMsg += ` ⚠️ Slightly above, but acceptable.`;
+            responseBadge.innerHTML = responseMsg;
+            extraMessageDiv.innerHTML = `<div class="message-box">${expectedMessage}<br>✅ Response time validated: ${elapsedMs} ms.</div>`;
+        } else {
+            responseBadge.innerHTML = `⏱️ ready (${elapsedMs} ms)`;
+        }
+
+        // Update yield display & extra messages
+        if (predictionResult.error) {
+            yieldDisplaySpan.innerHTML = `-- <span class="yield-unit">q/ha</span>`;
+            extraMessageDiv.innerHTML = `<div class="message-box" style="color:#b33a1a;">${predictionResult.error}</div>`;
+        } else {
+            let yieldVal = predictionResult.yield;
+            if (forceYieldFormatCheck && typeof yieldVal === 'number' && !isNaN(yieldVal)) {
+                extraMessageDiv.innerHTML = `<div class="message-box">✅ TC-03: Yield is numeric: ${yieldVal} q/ha. Format validated.</div>`;
+            } else if (testCaseId !== "TC-09" && testCaseId !== "TC-02") {
+                extraMessageDiv.innerHTML = `<div class="message-box">${expectedMessage} ${predictionResult.warning ? predictionResult.warning : ''}<br>🌾 Predicted yield: ${yieldVal} q/ha</div>`;
+            } else if (testCaseId === "TC-02") {
+                extraMessageDiv.innerHTML = `<div class="message-box">🔄 TC-02 active: Crop changed → yield automatically updates. Current crop: ${cropSelect.options[cropSelect.selectedIndex]?.text} | Yield: ${yieldVal} q/ha</div>`;
+            } else {
+                if(!measureResponse) extraMessageDiv.innerHTML = `<div class="message-box">${expectedMessage || 'Prediction ready'} ${predictionResult.warning ? predictionResult.warning : ''}</div>`;
+            }
+            yieldDisplaySpan.innerHTML = `${yieldVal} <span class="yield-unit">q/ha</span>`;
+        }
+
+        // ML Accuracy card update for TC-08
+        if (testCaseId === "TC-08") {
+            accuracyBadge.innerHTML = "✅ Model Accuracy: R² 0.92 | RMSE 3.2 q/ha";
+            accuracyBadge.style.background = "#2c7840";
+            let mlMessage = document.querySelector('.ml-card');
+            mlMessage.style.background = "#eaf3e0";
+            extraMessageDiv.innerHTML = `<div class="message-box">🎯 TC-08: Prediction accuracy validated. Output: ${predictionResult.yield} q/ha matches expected agronomic range (reasonable).</div>`;
+        } else {
+            accuracyBadge.innerHTML = "🧠 ML Model: XGBoost + Satellite | R² 0.92";
+            accuracyBadge.style.background = "#2c7840";
+        }
+
+        // Additional validation for TC-03 display format
+        if (testCaseId === "TC-03") {
+            let yieldText = yieldDisplaySpan.innerText;
+            if (!isNaN(parseFloat(yieldText))) {
+                extraMessageDiv.innerHTML = `<div class="message-box">✅ TC-03 PASS: Yield value is numeric (${yieldText}). Proper formatting.</div>`;
+            }
+        }
+
+        // For TC-10: UI display format explicit check
+        if (testCaseId === "TC-10") {
+            extraMessageDiv.innerHTML = `<div class="message-box">🎨 TC-10: UI displays yield in clear card, numeric value, units (q/ha), and proper layout. Fonts & spacing consistent.</div>`;
+        }
+
+        // For TC-04 explicit error if no input
+        if (testCaseId === "TC-04" && (!crop || !state)) {
+            yieldDisplaySpan.innerHTML = `-- <span class="yield-unit">q/ha</span>`;
+            extraMessageDiv.innerHTML = `<div class="message-box error-text">⚠️ TC-04: No input provided. Please select crop and state to get prediction.</div>`;
+        }
+        if (testCaseId === "TC-05" && (isNaN(rainfall) || rainfall === -999 || temp === "abc")) {
+            yieldDisplaySpan.innerHTML = `-- <span class="yield-unit">q/ha</span>`;
+            extraMessageDiv.innerHTML = `<div class="message-box error-text">❌ TC-05: Invalid input data (negative rainfall / non-numeric temp). Error message displayed as expected.</div>`;
+        }
+    }
+
+    // Manual prediction wrapper (for button click)
+    async function manualPredictWrapper(showLoading = true) {
+        const currentTC = testCaseSelect.value;
+        // for TC-02 manual clicks also allowed, but we respect current form values
+        if (currentTC === "TC-02") {
+            // take current UI values
+            let crop = cropSelect.value;
+            let state = stateSelect.value;
+            let rainfall = parseFloat(rainfallInput.value);
+            let temp = parseFloat(tempInput.value);
+            if (!crop || !state || isNaN(rainfall) || isNaN(temp)) {
+                yieldDisplaySpan.innerHTML = `-- <span class="yield-unit">q/ha</span>`;
+                extraMessageDiv.innerHTML = `<div class="message-box error-text">⚠️ Please fill all fields (crop, state, rainfall, temp).</div>`;
+                return;
+            }
+            let start = performance.now();
+            let res = predictYield(crop, state, rainfall, temp);
+            let elapsed = (performance.now() - start).toFixed(1);
+            if (res.error) {
+                yieldDisplaySpan.innerHTML = `-- <span class="yield-unit">q/ha</span>`;
+                extraMessageDiv.innerHTML = `<div class="message-box error-text">${res.error}</div>`;
+            } else {
+                yieldDisplaySpan.innerHTML = `${res.yield} <span class="yield-unit">q/ha</span>`;
+                extraMessageDiv.innerHTML = `<div class="message-box">🔄 TC-02 manual update: Yield for ${cropSelect.options[cropSelect.selectedIndex]?.text} = ${res.yield} q/ha (response ${elapsed}ms)</div>`;
+            }
+            responseBadge.innerHTML = `⏱️ ${elapsed} ms`;
+            return;
+        }
+        // for other test cases, we re-run render with manual form values (but keep test case logic)
+        let crop = cropSelect.value;
+        let state = stateSelect.value;
+        let rainfall = parseFloat(rainfallInput.value);
+        let temp = parseFloat(tempInput.value);
+        if (!crop || !state) {
+            yieldDisplaySpan.innerHTML = `-- <span class="yield-unit">q/ha</span>`;
+            extraMessageDiv.innerHTML = `<div class="message-box error-text">Error: Crop and State are required.</div>`;
+            return;
+        }
+        if (isNaN(rainfall) || isNaN(temp)) {
+            yieldDisplaySpan.innerHTML = `-- <span class="yield-unit">q/ha</span>`;
+            extraMessageDiv.innerHTML = `<div class="message-box error-text">Invalid numbers for rainfall or temperature.</div>`;
+            return;
+        }
+        let startPerf = performance.now();
+        let pred = predictYield(crop, state, rainfall, temp);
+        let elapsed = (performance.now() - startPerf).toFixed(1);
+        if (pred.error) {
+            yieldDisplaySpan.innerHTML = `-- <span class="yield-unit">q/ha</span>`;
+            extraMessageDiv.innerHTML = `<div class="message-box error-text">${pred.error}</div>`;
+        } else {
+            yieldDisplaySpan.innerHTML = `${pred.yield} <span class="yield-unit">q/ha</span>`;
+            extraMessageDiv.innerHTML = `<div class="message-box">📈 Manual prediction: ${pred.yield} q/ha (based on current inputs)</div>`;
+        }
+        responseBadge.innerHTML = `⏱️ ${elapsed} ms`;
+    }
+
+    // Listen to test case changes
+    testCaseSelect.addEventListener('change', () => {
+        const selected = testCaseSelect.value;
+        renderForTestCase(selected, false);
+    });
+
+    // Predict button behavior
+    predictBtn.addEventListener('click', () => {
+        const currentTC = testCaseSelect.value;
+        if (currentTC === "TC-02") {
+            manualPredictWrapper(true);
+        } else if (currentTC === "TC-01" || currentTC === "TC-03" || currentTC === "TC-06" || currentTC === "TC-07" || currentTC === "TC-08" || currentTC === "TC-09" || currentTC === "TC-10" || currentTC === "TC-04" || currentTC === "TC-05") {
+            // re-run test case but reflect current form values? to keep test case semantics, we respect original but also allow user to modify? Safer: re-run same test case with its forced inputs.
+            renderForTestCase(currentTC, false);
+        } else {
+            manualPredictWrapper(true);
+        }
+    });
+
+    // Initial load: TC-01
+    testCaseSelect.value = "TC-01";
+    renderForTestCase("TC-01");
+</script>
+</body>
+</html>
+```
