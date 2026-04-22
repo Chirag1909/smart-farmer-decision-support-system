@@ -1,36 +1,7 @@
 venv/
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-.Python
-env/
-.env
-.vscode/
-.DS_Store
-*.db
-*.db-journal
-*.pkl
-models/*.pkl
-node_modules/
-frontend/node_modules/
-web_app/frontend/node_modules/
-web_app/frontend/build/
-*.csv  # Exclude large datasets, or keep small ones
-Crop*/*.csv
-sensor*.csv
-*.xlsx
-*.jpeg
-*.png
-instance/
-*.csv
-*.xlsx
-*.zip
 *.pkl
 *.joblib
-__pycache__/
-venv/
+*.csv
 .env
-processed_data/
-mandi/
-High-Resolution Soil Moisture/
