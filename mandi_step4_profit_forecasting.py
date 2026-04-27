@@ -125,7 +125,7 @@ def profit_forecasting(yield_file, price_file, output_file):
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
     merged_df.to_csv(output_file, index=False)
 
-    print("✅ Profit forecasting completed")
+    print(" Profit forecasting completed")
     print(f"Saved to: {output_file}")
     print("Sample output:")
     print(merged_df.head())

@@ -64,7 +64,7 @@ final_cols = [
 df[final_cols].to_csv(OUTPUT_FILE, index=False)
 
 # ---------------- OUTPUT ----------------
-print("✅ Step-6 Net Profit Forecasting Completed")
+print(" Step-6 Net Profit Forecasting Completed")
 print(f"Saved to: {OUTPUT_FILE}")
 print("\nTop 5 Net Profit Crops:")
 print(df[final_cols].head())

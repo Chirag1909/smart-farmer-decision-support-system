@@ -47,4 +47,4 @@ if not all_states:
 final_weather = pd.concat(all_states, ignore_index=True)
 final_weather.to_csv("processed_data/weather_cleaned.csv", index=False)
 
-print("✅ Weather data processed as state-level climatic features")
+print(" Weather data processed as state-level climatic features")
