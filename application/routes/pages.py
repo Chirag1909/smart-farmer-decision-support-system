@@ -1,6 +1,11 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, jsonify
 
 pages_bp = Blueprint("pages", __name__)
+
+
+@pages_bp.get("/health")
+def health_check():
+    return jsonify({"status": "healthy", "message": "Server is running"}), 200
 
 
 @pages_bp.get("/")
