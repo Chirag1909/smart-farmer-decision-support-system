@@ -3,8 +3,11 @@ __pycache__/
 *.pyc
 *.pkl
 *.joblib
-*.csv
 .env
 node_modules/
 frontend/node_modules/
 frontend/build/
+
+# Allow processed data files (needed for deployment)
+!processed_data/
+!processed_data/*.csv

@@ -1,4 +1,5 @@
 import os
+import sys
 from functools import lru_cache
 
 import pandas as pd
@@ -11,15 +12,30 @@ MANDI_PATH = os.path.join(PROCESSED_DIR, "cleaned_mandi_prices.csv")
 COST_PATH = os.path.join(PROCESSED_DIR, "best_crop_net_profit_ranking.csv")
 
 
+def _check_required_files():
+    """Verify all required data files exist."""
+    required_files = [RANKING_PATH, MANDI_PATH, COST_PATH]
+    missing = [f for f in required_files if not os.path.exists(f)]
+    if missing:
+        print(f"ERROR: Missing required data files:", file=sys.stderr)
+        for f in missing:
+            print(f"  - {f}", file=sys.stderr)
+        raise FileNotFoundError(f"Cannot start: missing {len(missing)} data files. Check processed_data/ directory exists and has CSVs.")
+
+
 def _normalize_crop(crop_name: str) -> str:
     return str(crop_name).replace("type_", "").strip()
 
 
 @lru_cache(maxsize=1)
 def load_data():
-    ranking_df = pd.read_csv(RANKING_PATH)
-    mandi_df = pd.read_csv(MANDI_PATH)
-    cost_df = pd.read_csv(COST_PATH)
+    try:
+        ranking_df = pd.read_csv(RANKING_PATH)
+        mandi_df = pd.read_csv(MANDI_PATH)
+        cost_df = pd.read_csv(COST_PATH)
+    except FileNotFoundError as e:
+        _check_required_files()
+        raise
 
     ranking_df["crop"] = ranking_df["crop"].map(_normalize_crop)
     mandi_df["crop"] = mandi_df["crop"].map(_normalize_crop)
